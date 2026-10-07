@@ -67,4 +67,9 @@ interface ApiService {
         @Query("se") season: Int = 0,
         @Query("ep") episode: Int = 0
     ): PlayResponse
+
+    @GET("play")
+    suspend fun getNetplayPlay(
+        @Query("netplay_id") netplayId: String
+    ): PlayResponse
 }

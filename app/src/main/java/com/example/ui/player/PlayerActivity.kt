@@ -32,6 +32,8 @@ class PlayerActivity : AppCompatActivity() {
     private var contentId: String = ""
     private var mediaType: String = "movie"
     private var titleText: String = ""
+    private var posterUrl: String? = null
+    private var backdropUrl: String? = null
     private var seasonNum: Int = 0
     private var episodeNum: Int = 0
     private var resumePosition: Long = 0L
@@ -52,6 +54,8 @@ class PlayerActivity : AppCompatActivity() {
         contentId = intent.getStringExtra(EXTRA_CONTENT_ID).orEmpty()
         mediaType = intent.getStringExtra(EXTRA_MEDIA_TYPE) ?: "movie"
         titleText = intent.getStringExtra(EXTRA_TITLE).orEmpty()
+        posterUrl = intent.getStringExtra(EXTRA_POSTER)
+        backdropUrl = intent.getStringExtra(EXTRA_BACKDROP)
         seasonNum = intent.getIntExtra(EXTRA_SEASON, 0)
         episodeNum = intent.getIntExtra(EXTRA_EPISODE, 0)
         resumePosition = intent.getLongExtra(EXTRA_RESUME_POS, 0L)
@@ -61,7 +65,8 @@ class PlayerActivity : AppCompatActivity() {
         val offlineUri = intent.getStringExtra(EXTRA_OFFLINE_URI)
         if (!offlineUri.isNullOrBlank()) {
             binding.btnSwitchServer.visibility = View.GONE
-            playWithExoPlayer(offlineUri)
+            binding.tvPlayerTitle.text = "${titleText.ifEmpty { "ElitePlex" }} • Offline"
+            playWithExoPlayer(offlineUri, isOffline = true)
         } else {
             loadPlaybackSources()
         }
@@ -207,7 +212,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun playWithExoPlayer(url: String) {
+    private fun playWithExoPlayer(url: String, isOffline: Boolean = false) {
         binding.webViewContainer.visibility = View.GONE
         webView?.loadUrl("about:blank")
         binding.playerView.visibility = View.VISIBLE
@@ -217,7 +222,20 @@ class PlayerActivity : AppCompatActivity() {
 
         exoPlayer = ExoPlayer.Builder(this).build().apply {
             binding.playerView.player = this
-            val mediaItem = MediaItem.fromUri(url)
+
+            val uri = when {
+                url.startsWith("content://") || url.startsWith("file://") || url.startsWith("http://") || url.startsWith("https://") -> {
+                    android.net.Uri.parse(url)
+                }
+                url.startsWith("/") -> {
+                    android.net.Uri.fromFile(java.io.File(url))
+                }
+                else -> {
+                    android.net.Uri.parse(url)
+                }
+            }
+
+            val mediaItem = MediaItem.fromUri(uri)
             setMediaItem(mediaItem)
             if (resumePosition > 0) {
                 seekTo(resumePosition)
@@ -237,7 +255,14 @@ class PlayerActivity : AppCompatActivity() {
 
                 override fun onPlayerError(error: PlaybackException) {
                     binding.pbPlayerLoading.visibility = View.GONE
-                    playNextServer()
+                    if (isOffline) {
+                        showPlaybackError(
+                            "Cannot play downloaded video",
+                            "The downloaded file might be damaged or unavailable."
+                        )
+                    } else {
+                        playNextServer()
+                    }
                 }
             })
         }
@@ -294,8 +319,8 @@ class PlayerActivity : AppCompatActivity() {
                     id = contentId,
                     tmdbId = contentId,
                     title = titleText,
-                    poster = null,
-                    backdrop = null,
+                    poster = posterUrl,
+                    backdrop = backdropUrl,
                     type = mediaType,
                     seasonNumber = seasonNum,
                     episodeNumber = episodeNum,
@@ -342,6 +367,8 @@ class PlayerActivity : AppCompatActivity() {
         const val EXTRA_CONTENT_ID = "extra_content_id"
         const val EXTRA_MEDIA_TYPE = "extra_media_type"
         const val EXTRA_TITLE = "extra_title"
+        const val EXTRA_POSTER = "extra_poster"
+        const val EXTRA_BACKDROP = "extra_backdrop"
         const val EXTRA_SEASON = "extra_season"
         const val EXTRA_EPISODE = "extra_episode"
         const val EXTRA_RESUME_POS = "extra_resume_pos"

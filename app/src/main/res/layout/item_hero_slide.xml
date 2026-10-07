@@ -3,27 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_dark">
+    android:background="@color/bg_surface">
 
-    <!-- Backdrop Image -->
+    <!-- Hero Cinematic Image -->
     <ImageView
         android:id="@+id/iv_hero_backdrop"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
         android:background="@color/bg_surface"
-        android:contentDescription="Backdrop"
+        android:contentDescription="Featured Hero"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Gradient fade to dark -->
+    <!-- Cinematic Multi-stop Dark Gradient Overlay -->
     <View
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="280dp"
         android:background="@drawable/bg_gradient_overlay"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -33,12 +32,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Tags Row: Trending / Rating -->
+        <!-- Tags Row: Top Rated / Featured -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,22 +46,22 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/tv_hero_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_chip"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="3dp"
-                android:text="FEATURED"
-                android:textColor="@color/accent_gold"
-                android:textSize="10sp"
-                android:fontFamily="sans-serif-black"
-                android:letterSpacing="0.08" />
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="Top Rated"
+                android:textColor="@color/text_primary"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium" />
 
             <TextView
                 android:id="@+id/tv_hero_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="10dp"
                 android:text="2026"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
@@ -74,91 +74,105 @@
                 android:textColor="@color/text_dim"
                 android:textSize="12sp" />
 
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_marginStart="6dp"
-                android:src="@drawable/ic_star"
-                android:contentDescription="Rating" />
-
             <TextView
                 android:id="@+id/tv_hero_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="8.5"
-                android:textColor="@color/accent_gold"
+                android:layout_marginStart="6dp"
+                android:text="★ 8.4"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Title -->
+        <!-- Movie Title (prominent bold title matching screenshot) -->
         <TextView
             android:id="@+id/tv_hero_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-black"
             android:maxLines="2"
             android:ellipsize="end"
-            android:text="Spider-Man: Brand New Day"
+            android:text="Drishyam: The Conclusion"
             android:textColor="@color/text_primary"
-            android:textSize="22sp" />
+            android:textSize="24sp"
+            android:lineSpacingExtra="2dp" />
 
-        <!-- Overview -->
+        <!-- Subtitle / Meta information -->
         <TextView
-            android:id="@+id/tv_hero_overview"
+            android:id="@+id/tv_hero_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:ellipsize="end"
-            android:maxLines="2"
-            android:text="Fighting crime full-time in a world that doesn't remember him..."
+            android:maxLines="1"
+            android:text="Hindi • Feature Film"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
-        <!-- Buttons Row -->
+        <!-- Buttons Row: Play (White pill button), Bookmark (round glass), Info (round glass) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <com.google.android.material.button.MaterialButton
+            <!-- Play Button (White pill with black text and play icon) -->
+            <LinearLayout
                 android:id="@+id/btn_hero_watch"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_button_gold"
-                app:backgroundTint="@null"
-                android:text="Play"
-                android:textAllCaps="false"
-                android:textColor="@color/accent_gold_dark"
-                android:textStyle="bold"
-                android:textSize="13sp"
-                app:icon="@drawable/ic_play_arrow"
-                app:iconTint="@color/accent_gold_dark"
-                app:iconSize="18dp"
-                android:paddingHorizontal="18dp" />
+                android:layout_height="48dp"
+                android:background="@drawable/bg_nav_item_selected"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="24dp">
 
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_play_arrow"
+                    app:tint="@color/black"
+                    android:contentDescription="Play" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Play"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <!-- Bookmark Button (Circular glass outline button) -->
             <ImageView
                 android:id="@+id/btn_hero_bookmark"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
                 android:background="@drawable/bg_button_glass"
-                android:padding="11dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="13dp"
                 android:src="@drawable/ic_bookmark"
                 app:tint="@color/text_primary"
                 android:contentDescription="Bookmark" />
 
+            <!-- Info Button (Circular glass outline button with 'i' icon) -->
             <ImageView
                 android:id="@+id/btn_hero_details"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
                 android:background="@drawable/bg_button_glass"
-                android:padding="11dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="13dp"
                 android:src="@drawable/ic_info"
                 app:tint="@color/text_primary"
                 android:contentDescription="Details" />

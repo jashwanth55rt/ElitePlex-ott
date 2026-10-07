@@ -4,8 +4,8 @@
         <item name="android:windowBackground">@color/bg_dark</item>
         <item name="android:statusBarColor">@color/bg_dark</item>
         <item name="android:navigationBarColor">@color/bg_dark</item>
-        <item name="colorPrimary">@color/accent_gold</item>
-        <item name="colorOnPrimary">@color/accent_gold_dark</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item>
         <item name="colorSecondary">@color/floating_green</item>
         <item name="colorSurface">@color/bg_surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
@@ -15,17 +15,30 @@
 
     <style name="Widget.ElitePlex.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
         <item name="itemActiveIndicatorStyle">@style/Widget.ElitePlex.BottomNav.ActiveIndicator</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.ElitePlex.BottomNav.Active</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.ElitePlex.BottomNav.Inactive</item>
     </style>
 
     <style name="Widget.ElitePlex.BottomNav.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/white</item>
-        <item name="android:width">56dp</item>
-        <item name="android:height">32dp</item>
+        <item name="android:width">84dp</item>
+        <item name="android:height">42dp</item>
         <item name="shapeAppearance">@style/ShapeAppearance.ElitePlex.Pill</item>
     </style>
 
     <style name="ShapeAppearance.ElitePlex.Pill" parent="ShapeAppearance.Material3.Corner.Full">
-        <item name="cornerSize">16dp</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="TextAppearance.ElitePlex.BottomNav.Active" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.ElitePlex.BottomNav.Inactive" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textColor">@color/unselected_nav</item>
+        <item name="android:textSize">11sp</item>
     </style>
 
     <style name="Theme.ElitePlex.Fullscreen" parent="Theme.ElitePlex">

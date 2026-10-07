@@ -1,100 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="140dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_width="168dp"
+    android:layout_height="250dp"
     android:layout_marginEnd="12dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/bg_card">
 
-    <androidx.cardview.widget.CardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="@color/bg_surface">
+        android:layout_height="match_parent">
 
+        <!-- Full Poster Image (centerCrop) -->
         <ImageView
             android:id="@+id/iv_poster"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:scaleType="centerCrop"
             android:background="@drawable/bg_poster_placeholder"
-            android:contentDescription="Poster" />
+            android:contentDescription="Poster"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- Deep Bottom Gradient -->
         <View
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/bg_gradient_overlay" />
+            android:layout_width="0dp"
+            android:layout_height="130dp"
+            android:background="@drawable/bg_gradient_overlay"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Rating Pill Top-Right -->
+        <!-- Rating Pill Top-Right (★ 8.3) -->
         <LinearLayout
             android:id="@+id/layout_rating"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_margin="8dp"
-            android:gravity="center_vertical"
+            android:layout_height="24dp"
+            android:layout_margin="10dp"
             android:background="@drawable/bg_chip"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="3dp">
-
-            <ImageView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star"
-                android:contentDescription="Rating" />
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
                 android:id="@+id/tv_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="8.2"
-                android:textColor="@color/accent_gold"
+                android:text="★ 8.3"
+                android:textColor="@color/text_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Media Type Badge Top-Left -->
+        <!-- Media Type Badge Top-Left (TV/Anime/HD) -->
         <TextView
             android:id="@+id/tv_badge_type"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_margin="8dp"
+            android:layout_height="24dp"
+            android:layout_margin="10dp"
             android:background="@drawable/bg_chip"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="3dp"
-            android:text="HD"
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            android:text="TV"
             android:textAllCaps="true"
             android:textColor="@color/text_primary"
             android:textSize="10sp"
-            android:textStyle="bold" />
-    </androidx.cardview.widget.CardView>
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Movie Title"
-        android:textColor="@color/text_primary"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+        <!-- Play Button Bottom-Left -->
+        <ImageView
+            android:id="@+id/iv_card_play"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_button_glass"
+            android:padding="8dp"
+            android:src="@drawable/ic_play_arrow"
+            app:tint="@color/white"
+            android:contentDescription="Play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_year"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="2026"
-        android:textColor="@color/text_dim"
-        android:textSize="11sp" />
+        <!-- Title & Subtitle Info at Bottom-Left -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_card_play"
+            app:layout_constraintEnd_toEndOf="parent">
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-bold"
+                android:maxLines="1"
+                android:text="Movie Title"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_year"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Movie"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

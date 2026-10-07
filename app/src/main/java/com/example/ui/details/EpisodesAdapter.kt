@@ -53,7 +53,7 @@ class EpisodesAdapter(
 
     companion object EpisodeDiffCallback : DiffUtil.ItemCallback<Episode>() {
         override fun areItemsTheSame(oldItem: Episode, newItem: Episode): Boolean {
-            return oldItem.episodeNumber == newItem.episodeNumber
+            return oldItem.episodeNumber == newItem.episodeNumber && oldItem.name == newItem.name
         }
 
         override fun areContentsTheSame(oldItem: Episode, newItem: Episode): Boolean {

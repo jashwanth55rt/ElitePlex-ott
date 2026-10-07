@@ -20,7 +20,7 @@ class MyListAdapter(
         fun bind(item: SavedItemEntity) {
             binding.tvTitle.text = item.title
             binding.tvYear.text = item.year ?: ""
-            binding.tvRating.text = item.rating?.let { String.format("%.1f", it) } ?: "N/A"
+            binding.tvRating.text = item.rating?.let { "★ " + String.format("%.1f", it) } ?: "★ 8.0"
             binding.tvBadgeType.text = if (item.type.equals("tv", ignoreCase = true)) "TV" else "MOVIE"
 
             val poster = item.poster ?: item.backdrop

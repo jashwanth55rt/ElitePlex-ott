@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -20,6 +21,7 @@ import com.example.databinding.FragmentMoviesBinding
 import com.example.ui.details.MovieDetailsActivity
 import com.example.ui.viewmodel.MoviesUiState
 import com.example.ui.viewmodel.MoviesViewModel
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -59,23 +61,39 @@ class MoviesFragment : Fragment() {
     }
 
     private fun setupGenreChips() {
-        val genres = listOf("All", "Anime", "Action", "Comedy", "Drama", "Sci-Fi", "Horror", "Animation")
+        val genres = listOf("All", "Anime", "Action", "Comedy", "Drama", "Sci-Fi", "Horror")
         binding.chipGroupGenres.removeAllViews()
         for ((index, g) in genres.withIndex()) {
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+            val chip = Chip(requireContext()).apply {
                 text = g
                 isCheckable = true
                 isChecked = index == 0
-                setTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_primary))
-                setChipBackgroundColorResource(R.color.bg_card)
-                setChipStrokeColorResource(R.color.border)
-                chipStrokeWidth = 1f
-                setOnClickListener {
-                    // Filter or refresh
-                    viewModel.refresh()
+                setEnsureMinTouchTargetSize(false)
+                chipCornerRadius = resources.displayMetrics.density * 10
+                updateChipColors(this, isChecked)
+                setOnCheckedChangeListener { _, checked ->
+                    updateChipColors(this, checked)
+                    if (checked) {
+                        viewModel.filterByGenre(g)
+                    }
                 }
             }
             binding.chipGroupGenres.addView(chip)
+        }
+    }
+
+    private fun updateChipColors(chip: Chip, isChecked: Boolean) {
+        val context = chip.context
+        if (isChecked) {
+            chip.setTextColor(ContextCompat.getColor(context, R.color.selected_text))
+            chip.setChipBackgroundColorResource(R.color.selected_background)
+            chip.setChipStrokeColorResource(R.color.selected_background)
+            chip.chipStrokeWidth = 0f
+        } else {
+            chip.setTextColor(ContextCompat.getColor(context, R.color.chip_text_unselected))
+            chip.setChipBackgroundColorResource(R.color.chip_bg_unselected)
+            chip.setChipStrokeColorResource(R.color.border)
+            chip.chipStrokeWidth = 1f
         }
     }
 
@@ -106,7 +124,7 @@ class MoviesFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.swipeRefresh.setColorSchemeResources(R.color.accent_gold)
+        binding.swipeRefresh.setColorSchemeResources(R.color.accent_green)
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refresh()
         }
@@ -160,6 +178,9 @@ class MoviesFragment : Fragment() {
             putExtra(MovieDetailsActivity.EXTRA_ID, item.displayId)
             putExtra(MovieDetailsActivity.EXTRA_IS_TV, false)
             putExtra(MovieDetailsActivity.EXTRA_TITLE, item.displayTitle)
+            val posterUrl = item.resolvedPoster ?: item.resolvedBackdrop
+            putExtra(MovieDetailsActivity.EXTRA_POSTER, posterUrl)
+            putExtra(MovieDetailsActivity.EXTRA_BACKDROP, item.resolvedBackdrop ?: posterUrl)
         }
         startActivity(intent)
     }

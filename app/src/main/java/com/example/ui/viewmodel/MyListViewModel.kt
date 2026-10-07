@@ -35,4 +35,10 @@ class MyListViewModel(
             savedRepository.removeItem(id)
         }
     }
+
+    fun syncDownloads(context: android.content.Context) {
+        viewModelScope.launch {
+            com.example.utils.DownloadHelper.syncDownloads(context)
+        }
+    }
 }

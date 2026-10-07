@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Rounded Shield / Rounded Hexagon with EP Monogram -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M24,4 L40,12 L40,36 L24,44 L8,36 L8,12 Z" />
+    <!-- Monogram letters EP / Play symbol stylized inside -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,16 h14 v3.5 h-10 v4 h8 v3.5 h-8 v5 h-4 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M27,24 h5 c2.5,0 4.5,-1.5 4.5,-4 s-2,-4 -4.5,-4 h-5 v8 Z M31,19.5 c0.8,0 1.5,0.4 1.5,1.2 s-0.7,1.2 -1.5,1.2 h-1 v-2.4 Z" />
+</vector>

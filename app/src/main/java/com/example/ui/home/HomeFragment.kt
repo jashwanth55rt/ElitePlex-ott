@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -13,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.ElitePlexApplication
 import com.example.MainActivity
 import com.example.R
@@ -41,7 +45,10 @@ class HomeFragment : Fragment() {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return HomeViewModel(app.movieRepository, app.searchRepository) as T
+                return HomeViewModel(
+                    movieRepository = app.movieRepository,
+                    searchRepository = app.searchRepository
+                ) as T
             }
         })[HomeViewModel::class.java]
     }
@@ -61,22 +68,31 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupHeader()
         setupStreamingPlatforms()
         setupContinueWatching()
         setupListeners()
         observeData()
     }
 
+    private fun setupHeader() {
+        binding.btnHomeSearch.setOnClickListener {
+            (activity as? MainActivity)?.navigateToSearch()
+        }
+    }
+
     private fun setupStreamingPlatforms() {
         val platforms = listOf(
-            StreamingPlatform("netflix", "Netflix", R.drawable.ic_platform_netflix, "netflix"),
-            StreamingPlatform("prime", "Prime Video", R.drawable.ic_platform_prime, "prime"),
-            StreamingPlatform("hotstar", "JioHotstar", R.drawable.ic_platform_hotstar, "hotstar"),
-            StreamingPlatform("lionsgate", "Lionsgate Play", R.drawable.ic_platform_lionsgate, "lionsgate")
+            StreamingPlatform("Netflix", R.drawable.ic_platform_netflix, "netflix"),
+            StreamingPlatform("Prime Video", R.drawable.ic_platform_prime, "prime"),
+            StreamingPlatform("JioHotstar", R.drawable.ic_platform_hotstar, "hotstar"),
+            StreamingPlatform("Lionsgate Play", R.drawable.ic_platform_lionsgate, "lionsgate")
         )
+
         val adapter = StreamingPlatformAdapter(platforms) { platform ->
             (activity as? MainActivity)?.openSearchWithQuery(platform.name)
         }
+
         binding.rvStreamingPlatforms.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             this.adapter = adapter
@@ -86,12 +102,14 @@ class HomeFragment : Fragment() {
     private fun setupContinueWatching() {
         continueWatchingAdapter = ContinueWatchingAdapter { historyItem ->
             val intent = Intent(requireContext(), PlayerActivity::class.java).apply {
-                putExtra(PlayerActivity.EXTRA_CONTENT_ID, historyItem.tmdbId)
+                putExtra(PlayerActivity.EXTRA_CONTENT_ID, historyItem.id)
                 putExtra(PlayerActivity.EXTRA_MEDIA_TYPE, historyItem.type)
                 putExtra(PlayerActivity.EXTRA_TITLE, historyItem.title)
                 putExtra(PlayerActivity.EXTRA_SEASON, historyItem.seasonNumber)
                 putExtra(PlayerActivity.EXTRA_EPISODE, historyItem.episodeNumber)
                 putExtra(PlayerActivity.EXTRA_RESUME_POS, historyItem.playbackPosition)
+                putExtra(PlayerActivity.EXTRA_POSTER, historyItem.poster ?: historyItem.backdrop)
+                putExtra(PlayerActivity.EXTRA_BACKDROP, historyItem.backdrop ?: historyItem.poster)
             }
             startActivity(intent)
         }
@@ -102,7 +120,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.swipeRefresh.setColorSchemeResources(R.color.accent_gold)
+        binding.swipeRefresh.setColorSchemeResources(R.color.accent_green)
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadHomeCatalog()
         }
@@ -165,10 +183,13 @@ class HomeFragment : Fragment() {
     private fun setupHeroSection(heroItems: List<MovieItem>) {
         if (heroItems.isEmpty()) {
             binding.heroViewPager.visibility = View.GONE
+            binding.layoutHeroDots.visibility = View.GONE
             autoSlideJob?.cancel()
             return
         }
         binding.heroViewPager.visibility = View.VISIBLE
+        binding.layoutHeroDots.visibility = View.VISIBLE
+
         val app = requireActivity().application as ElitePlexApplication
         val adapter = HeroBannerAdapter(
             items = heroItems,
@@ -177,6 +198,9 @@ class HomeFragment : Fragment() {
                     putExtra(PlayerActivity.EXTRA_CONTENT_ID, item.displayId)
                     putExtra(PlayerActivity.EXTRA_MEDIA_TYPE, if (item.isTvSeries) "tv" else "movie")
                     putExtra(PlayerActivity.EXTRA_TITLE, item.displayTitle)
+                    val posterUrl = item.resolvedPoster ?: item.resolvedBackdrop
+                    putExtra(PlayerActivity.EXTRA_POSTER, posterUrl)
+                    putExtra(PlayerActivity.EXTRA_BACKDROP, item.resolvedBackdrop ?: posterUrl)
                 }
                 startActivity(intent)
             },
@@ -189,8 +213,8 @@ class HomeFragment : Fragment() {
                         id = item.displayId,
                         tmdbId = item.displayId,
                         title = item.displayTitle,
-                        poster = item.poster,
-                        backdrop = item.backdrop,
+                        poster = item.resolvedPoster,
+                        backdrop = item.resolvedBackdrop,
                         type = if (item.isTvSeries) "tv" else "movie",
                         rating = item.rating,
                         year = item.year,
@@ -203,7 +227,52 @@ class HomeFragment : Fragment() {
             }
         )
         binding.heroViewPager.adapter = adapter
+
+        setupHeroDots(heroItems.size)
+
+        binding.heroViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateHeroDots(position, heroItems.size)
+            }
+        })
+
         startAutoSlide(heroItems.size)
+    }
+
+    private fun setupHeroDots(count: Int) {
+        binding.layoutHeroDots.removeAllViews()
+        val context = requireContext()
+        for (i in 0 until count) {
+            val dot = View(context).apply {
+                val size = if (i == 0) 18 else 6
+                val params = LinearLayout.LayoutParams(
+                    (size * resources.displayMetrics.density).toInt(),
+                    (6 * resources.displayMetrics.density).toInt()
+                ).apply {
+                    setMargins(
+                        (3 * resources.displayMetrics.density).toInt(),
+                        0,
+                        (3 * resources.displayMetrics.density).toInt(),
+                        0
+                    )
+                }
+                layoutParams = params
+                setBackgroundResource(if (i == 0) R.drawable.bg_nav_item_selected else R.drawable.bg_chip)
+            }
+            binding.layoutHeroDots.addView(dot)
+        }
+    }
+
+    private fun updateHeroDots(selected: Int, count: Int) {
+        for (i in 0 until count) {
+            val dot = binding.layoutHeroDots.getChildAt(i) ?: continue
+            val isCurrent = i == selected
+            val widthDp = if (isCurrent) 18 else 6
+            val params = dot.layoutParams as LinearLayout.LayoutParams
+            params.width = (widthDp * resources.displayMetrics.density).toInt()
+            dot.layoutParams = params
+            dot.setBackgroundResource(if (isCurrent) R.drawable.bg_nav_item_selected else R.drawable.bg_chip)
+        }
     }
 
     private fun startAutoSlide(itemCount: Int) {
@@ -223,19 +292,13 @@ class HomeFragment : Fragment() {
     private fun setupContentSections(state: HomeUiState.Success) {
         binding.sectionsContainer.removeAllViews()
 
-        val allItems = (state.trending + state.popularMovies + state.topMovies)
-
         val sections = listOf(
             "Trending Movies" to state.trending,
-            "Trending Movies - Cinema" to state.popularMovies.reversed().take(10),
             "Popular Movies" to state.popularMovies,
-            "Latest Movies" to state.popularMovies.take(10),
+            "Latest Movies" to (state.netplayExclusives.ifEmpty { state.topMovies }),
             "Top Rated Movies" to state.topMovies,
-            "Popular TV Series" to state.popularTv,
-            "Top Rated TV Series" to state.topTv,
-            "Trending Anime & Animation" to state.trendingAnime,
-            "Action & Adventure" to allItems.filter { it.displayTitle.contains("man", true) || it.displayTitle.contains("war", true) || it.displayTitle.contains("avatar", true) }.take(8),
-            "Recommended For You" to state.trending.reversed().take(10)
+            "Recommended" to state.popularTv,
+            "Anime & Animation Hits" to state.trendingAnime
         )
 
         for ((title, items) in sections) {
@@ -247,9 +310,13 @@ class HomeFragment : Fragment() {
 
     private fun addSectionView(title: String, items: List<MovieItem>) {
         val sectionBinding = ItemContentSectionBinding.inflate(
-            layoutInflater, binding.sectionsContainer, false
+            layoutInflater,
+            binding.sectionsContainer,
+            false
         )
+
         sectionBinding.tvSectionTitle.text = title
+        sectionBinding.tvSectionCount.text = "${items.size} titles"
 
         val adapter = HorizontalMovieAdapter { item ->
             openDetails(item)
@@ -268,6 +335,9 @@ class HomeFragment : Fragment() {
             putExtra(MovieDetailsActivity.EXTRA_ID, item.displayId)
             putExtra(MovieDetailsActivity.EXTRA_IS_TV, item.isTvSeries)
             putExtra(MovieDetailsActivity.EXTRA_TITLE, item.displayTitle)
+            val posterUrl = item.resolvedPoster ?: item.resolvedBackdrop
+            putExtra(MovieDetailsActivity.EXTRA_POSTER, posterUrl)
+            putExtra(MovieDetailsActivity.EXTRA_BACKDROP, item.resolvedBackdrop ?: posterUrl)
         }
         startActivity(intent)
     }

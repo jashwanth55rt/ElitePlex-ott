@@ -15,6 +15,8 @@ sealed interface SeriesUiState {
         val items: List<MovieItem>,
         val page: Int,
         val totalPages: Int,
+        val totalResults: Int = 0,
+        val selectedGenre: String = "All",
         val isLoadingMore: Boolean = false
     ) : SeriesUiState
     data class Error(val message: String) : SeriesUiState
@@ -29,8 +31,10 @@ class SeriesViewModel(
 
     private var currentPage = 1
     private var totalPages = 1
+    private var totalResults = 0
     private var isFetching = false
     private val allSeries = mutableListOf<MovieItem>()
+    private var currentGenre = "All"
 
     init {
         loadSeries(page = 1)
@@ -42,11 +46,39 @@ class SeriesViewModel(
         loadSeries(page = 1)
     }
 
+    fun filterByGenre(genre: String) {
+        currentGenre = genre
+        emitCurrentState(isLoadingMore = false)
+    }
+
     fun loadNextPage() {
         if (isFetching || currentPage >= totalPages) return
         val currentSuccess = _uiState.value as? SeriesUiState.Success ?: return
         _uiState.value = currentSuccess.copy(isLoadingMore = true)
         loadSeries(page = currentPage + 1)
+    }
+
+    private fun emitCurrentState(isLoadingMore: Boolean) {
+        val filtered = if (currentGenre == "All") {
+            allSeries.toList()
+        } else {
+            val query = currentGenre.lowercase()
+            allSeries.filter { item ->
+                val title = item.displayTitle.lowercase()
+                val overview = (item.overview ?: "").lowercase()
+                title.contains(query) || overview.contains(query) ||
+                (query == "anime" && (title.contains("animation") || overview.contains("anime") || overview.contains("manga")))
+            }
+        }
+
+        _uiState.value = SeriesUiState.Success(
+            items = filtered,
+            page = currentPage,
+            totalPages = totalPages,
+            totalResults = if (totalResults > 0) totalResults else allSeries.size,
+            selectedGenre = currentGenre,
+            isLoadingMore = isLoadingMore
+        )
     }
 
     private fun loadSeries(page: Int) {
@@ -62,29 +94,26 @@ class SeriesViewModel(
             result.onSuccess { catalog ->
                 currentPage = catalog.page ?: page
                 totalPages = catalog.totalPages ?: 1
+                totalResults = catalog.totalResults ?: totalResults
 
                 val newItems = catalog.items.orEmpty()
                 if (page == 1) {
                     allSeries.clear()
                 }
-                allSeries.addAll(newItems)
 
-                _uiState.value = SeriesUiState.Success(
-                    items = allSeries.toList(),
-                    page = currentPage,
-                    totalPages = totalPages,
-                    isLoadingMore = false
-                )
+                // Deduplicate by displayId to avoid DiffUtil crashes
+                val existingIds = allSeries.map { it.displayId }.toSet()
+                val uniqueNew = newItems.filter { it.displayId !in existingIds }
+                allSeries.addAll(uniqueNew)
+
+                emitCurrentState(isLoadingMore = false)
             }.onFailure { error ->
                 if (allSeries.isEmpty()) {
                     _uiState.value = SeriesUiState.Error(
                         error.localizedMessage ?: "Unable to load TV series."
                     )
                 } else {
-                    val current = _uiState.value as? SeriesUiState.Success
-                    if (current != null) {
-                        _uiState.value = current.copy(isLoadingMore = false)
-                    }
+                    emitCurrentState(isLoadingMore = false)
                 }
             }
             isFetching = false

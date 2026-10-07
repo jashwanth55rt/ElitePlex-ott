@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.size.Scale
 import com.example.R
 import com.example.data.model.MovieItem
 import com.example.databinding.ItemHeroSlideBinding
@@ -19,17 +20,25 @@ class HeroBannerAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: MovieItem) {
-            val imageSource = item.backdrop ?: item.poster
+            val imageSource = item.resolvedBackdrop ?: item.resolvedPoster
             binding.ivHeroBackdrop.load(imageSource) {
                 crossfade(true)
+                scale(Scale.FILL)
                 placeholder(R.drawable.bg_poster_placeholder)
                 error(R.drawable.bg_poster_placeholder)
             }
 
             binding.tvHeroTitle.text = item.displayTitle
             binding.tvHeroYear.text = item.year ?: "2026"
-            binding.tvHeroRating.text = item.formattedRating
-            binding.tvHeroOverview.text = item.overview ?: "Stream this featured title on ElitePlex."
+            binding.tvHeroRating.text = "★ ${item.formattedRating}"
+
+            val subtitleText = if (item.isTvSeries) {
+                "${item.year ?: "2026"} • TV Series"
+            } else {
+                "${item.year ?: "2026"} • Feature Film"
+            }
+            binding.tvHeroSubtitle.text = subtitleText
+            binding.tvHeroBadge.text = if (item.rating != null && item.rating >= 8.0) "Top Rated" else "Featured"
 
             binding.btnHeroWatch.setOnClickListener { onWatchClick(item) }
             binding.btnHeroDetails.setOnClickListener { onDetailsClick(item) }

@@ -15,6 +15,8 @@ sealed interface MoviesUiState {
         val items: List<MovieItem>,
         val page: Int,
         val totalPages: Int,
+        val totalResults: Int = 0,
+        val selectedGenre: String = "All",
         val isLoadingMore: Boolean = false
     ) : MoviesUiState
     data class Error(val message: String) : MoviesUiState
@@ -29,8 +31,10 @@ class MoviesViewModel(
 
     private var currentPage = 1
     private var totalPages = 1
+    private var totalResults = 0
     private var isFetching = false
     private val allMovies = mutableListOf<MovieItem>()
+    private var currentGenre = "All"
 
     init {
         loadMovies(page = 1)
@@ -42,11 +46,39 @@ class MoviesViewModel(
         loadMovies(page = 1)
     }
 
+    fun filterByGenre(genre: String) {
+        currentGenre = genre
+        emitCurrentState(isLoadingMore = false)
+    }
+
     fun loadNextPage() {
         if (isFetching || currentPage >= totalPages) return
         val currentSuccess = _uiState.value as? MoviesUiState.Success ?: return
         _uiState.value = currentSuccess.copy(isLoadingMore = true)
         loadMovies(page = currentPage + 1)
+    }
+
+    private fun emitCurrentState(isLoadingMore: Boolean) {
+        val filtered = if (currentGenre == "All") {
+            allMovies.toList()
+        } else {
+            val query = currentGenre.lowercase()
+            allMovies.filter { item ->
+                val title = item.displayTitle.lowercase()
+                val overview = (item.overview ?: "").lowercase()
+                title.contains(query) || overview.contains(query) ||
+                (query == "anime" && (title.contains("animation") || overview.contains("anime") || overview.contains("manga")))
+            }
+        }
+
+        _uiState.value = MoviesUiState.Success(
+            items = filtered,
+            page = currentPage,
+            totalPages = totalPages,
+            totalResults = if (totalResults > 0) totalResults else allMovies.size,
+            selectedGenre = currentGenre,
+            isLoadingMore = isLoadingMore
+        )
     }
 
     private fun loadMovies(page: Int) {
@@ -62,29 +94,26 @@ class MoviesViewModel(
             result.onSuccess { catalog ->
                 currentPage = catalog.page ?: page
                 totalPages = catalog.totalPages ?: 1
+                totalResults = catalog.totalResults ?: totalResults
 
                 val newItems = catalog.items.orEmpty()
                 if (page == 1) {
                     allMovies.clear()
                 }
-                allMovies.addAll(newItems)
 
-                _uiState.value = MoviesUiState.Success(
-                    items = allMovies.toList(),
-                    page = currentPage,
-                    totalPages = totalPages,
-                    isLoadingMore = false
-                )
+                // Deduplicate by displayId to prevent DiffUtil duplicate crashes
+                val existingIds = allMovies.map { it.displayId }.toSet()
+                val uniqueNew = newItems.filter { it.displayId !in existingIds }
+                allMovies.addAll(uniqueNew)
+
+                emitCurrentState(isLoadingMore = false)
             }.onFailure { error ->
                 if (allMovies.isEmpty()) {
                     _uiState.value = MoviesUiState.Error(
                         error.localizedMessage ?: "Unable to load movies."
                     )
                 } else {
-                    val current = _uiState.value as? MoviesUiState.Success
-                    if (current != null) {
-                        _uiState.value = current.copy(isLoadingMore = false)
-                    }
+                    emitCurrentState(isLoadingMore = false)
                 }
             }
             isFetching = false

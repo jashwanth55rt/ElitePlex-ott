@@ -15,7 +15,57 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="80dp">
+            android:paddingBottom="96dp">
+
+            <!-- Home Pill Header (Exclusive to Home Screen) -->
+            <!-- 64dp height, 16dp horizontal margin, 12dp top margin, 32dp corner radius, #071719 background -->
+            <LinearLayout
+                android:id="@+id/home_header_bar"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_header_teal_pill"
+                android:elevation="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <!-- ElitePlex Logo -->
+                <ImageView
+                    android:id="@+id/iv_home_logo"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_eliteplex_logo"
+                    android:contentDescription="ElitePlex Logo" />
+
+                <!-- ElitePlex Title -->
+                <TextView
+                    android:id="@+id/tv_home_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-black"
+                    android:letterSpacing="0.04"
+                    android:text="ElitePlex"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp" />
+
+                <!-- Search Action Icon Button -->
+                <ImageView
+                    android:id="@+id/btn_home_search"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_primary"
+                    android:contentDescription="Search" />
+            </LinearLayout>
 
             <!-- Loading State -->
             <ProgressBar
@@ -24,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="80dp"
-                android:indeterminateTint="@color/accent_gold"
+                android:indeterminateTint="@color/accent_green"
                 android:visibility="gone" />
 
             <!-- Error State -->
@@ -59,14 +109,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_button_gold"
+                    android:background="@drawable/bg_button_glass"
                     app:backgroundTint="@null"
                     android:text="Retry"
                     android:textAllCaps="false"
-                    android:textColor="@color/accent_gold_dark"
+                    android:textColor="@color/text_primary"
                     android:textStyle="bold"
                     app:icon="@drawable/ic_refresh"
-                    app:iconTint="@color/accent_gold_dark" />
+                    app:iconTint="@color/text_primary" />
             </LinearLayout>
 
             <!-- Main Content Container -->
@@ -76,11 +126,30 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Hero Carousel ViewPager2 -->
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/hero_view_pager"
+                <!-- Hero Carousel ViewPager2 with 24dp Card Elevation -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
-                    android:layout_height="380dp" />
+                    android:layout_height="520dp"
+                    android:layout_marginHorizontal="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/bg_surface">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/hero_view_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Indicator dots container -->
+                <LinearLayout
+                    android:id="@+id/layout_hero_dots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="8dp" />
 
                 <!-- Streaming Platforms Section -->
                 <LinearLayout
@@ -88,29 +157,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="16dp">
+                    android:layout_marginTop="12dp">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
+                        android:fontFamily="sans-serif-black"
+                        android:text="Streaming Platforms"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
                         android:paddingHorizontal="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <View
-                            android:layout_width="4dp"
-                            android:layout_height="18dp"
-                            android:background="@color/accent_gold"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
-                            android:text="Streaming Platforms"
-                            android:textColor="@color/text_primary"
-                            android:textSize="17sp" />
-                    </LinearLayout>
+                        android:layout_marginBottom="12dp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_streaming_platforms"
@@ -127,31 +184,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="20dp"
                     android:visibility="gone">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
+                        android:fontFamily="sans-serif-black"
+                        android:text="Continue Watching"
+                        android:textColor="@color/text_primary"
+                        android:textSize="18sp"
                         android:paddingHorizontal="16dp"
-                        android:layout_marginBottom="12dp">
-
-                        <View
-                            android:layout_width="4dp"
-                            android:layout_height="18dp"
-                            android:background="@color/accent_teal"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
-                            android:text="Continue Watching"
-                            android:textColor="@color/text_primary"
-                            android:textSize="17sp" />
-                    </LinearLayout>
+                        android:layout_marginBottom="12dp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_continue_watching"
@@ -162,13 +206,13 @@
                         android:paddingEnd="4dp" />
                 </LinearLayout>
 
-                <!-- Sections Container -->
+                <!-- Dynamic Content Sections Container (Trending Movies, Popular Movies, Latest Movies, Top Rated Movies, etc.) -->
                 <LinearLayout
                     android:id="@+id/sections_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="20dp" />
+                    android:layout_marginTop="16dp" />
 
             </LinearLayout>
 

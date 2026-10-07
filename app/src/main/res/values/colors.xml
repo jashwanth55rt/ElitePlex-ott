@@ -6,21 +6,23 @@
     <color name="bg_surface">#18181C</color>
     <color name="bg_surface_elevated">#202027</color>
     <color name="bg_card">#18181C</color>
-    <color name="bg_nav">#CC18181C</color>
+    <color name="bg_nav">#EE111111</color>
+    <color name="bg_header_teal">#071719</color>
 
     <!-- Accents -->
+    <color name="accent_green">#24D66B</color>
+    <color name="floating_green">#24D66B</color>
+    <color name="floating_green_dark">#1BB557</color>
     <color name="accent_gold">#FFB62E</color>
     <color name="accent_gold_dark">#1A1400</color>
     <color name="accent_hot">#FF4F6D</color>
-    <color name="accent_teal">#3DDC97</color>
-    <color name="floating_green">#00E676</color>
-    <color name="floating_green_dark">#00B359</color>
+    <color name="accent_teal">#24D66B</color>
 
     <!-- Typography -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#A0A0A8</color>
     <color name="text_dim">#6A6A74</color>
-    <color name="unselected_nav">#999999</color>
+    <color name="unselected_nav">#AAAAAA</color>
 
     <!-- Borders and Lines -->
     <color name="card_stroke">#35353D</color>
@@ -28,7 +30,9 @@
     <color name="divider_line">#1AFFFFFF</color>
 
     <!-- Selections -->
-    <color name="chip_bg">#202027</color>
+    <color name="chip_bg">#101010</color>
+    <color name="chip_bg_unselected">#101010</color>
+    <color name="chip_text_unselected">#FFFFFF</color>
     <color name="selected_background">#FFFFFF</color>
     <color name="selected_text">#000000</color>
 

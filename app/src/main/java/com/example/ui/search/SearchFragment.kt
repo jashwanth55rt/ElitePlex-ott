@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.ElitePlexApplication
+import com.example.MainActivity
 import com.example.R
 import com.example.data.model.MovieItem
 import com.example.databinding.FragmentSearchBinding
@@ -61,6 +62,10 @@ class SearchFragment : Fragment() {
         setupSearchInput()
         setupGenreFilterChips()
         observeData()
+
+        binding.btnSearchBack.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -74,25 +79,41 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupGenreFilterChips() {
-        val genres = listOf("All", "Anime", "Action", "Comedy", "Drama", "Sci-Fi", "Horror", "Animation")
+        val genres = listOf("All", "Action", "Comedy", "Drama", "Sci-Fi", "Horror", "Animation")
         binding.chipGroupSearchGenres.removeAllViews()
         for ((index, g) in genres.withIndex()) {
             val chip = Chip(requireContext()).apply {
                 text = g
                 isCheckable = true
                 isChecked = index == 0
-                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                setChipBackgroundColorResource(R.color.bg_card)
-                setChipStrokeColorResource(R.color.border)
-                chipStrokeWidth = 1f
-                setOnClickListener {
-                    if (g != "All") {
+                setEnsureMinTouchTargetSize(false)
+                chipCornerRadius = resources.displayMetrics.density * 10
+                updateChipColors(this, isChecked)
+                setOnCheckedChangeListener { _, checked ->
+                    updateChipColors(this, checked)
+                    if (checked && g != "All") {
                         binding.etSearch.setText(g)
+                        binding.etSearch.setSelection(g.length)
                         viewModel.submitSearch(g)
                     }
                 }
             }
             binding.chipGroupSearchGenres.addView(chip)
+        }
+    }
+
+    private fun updateChipColors(chip: Chip, isChecked: Boolean) {
+        val context = chip.context
+        if (isChecked) {
+            chip.setTextColor(ContextCompat.getColor(context, R.color.selected_text))
+            chip.setChipBackgroundColorResource(R.color.selected_background)
+            chip.setChipStrokeColorResource(R.color.selected_background)
+            chip.chipStrokeWidth = 0f
+        } else {
+            chip.setTextColor(ContextCompat.getColor(context, R.color.chip_text_unselected))
+            chip.setChipBackgroundColorResource(R.color.chip_bg_unselected)
+            chip.setChipStrokeColorResource(R.color.border)
+            chip.chipStrokeWidth = 1f
         }
     }
 
@@ -102,14 +123,19 @@ class SearchFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val text = s?.toString().orEmpty()
                 binding.btnClearSearch.visibility = if (text.isNotEmpty()) View.VISIBLE else View.GONE
-                viewModel.onQueryChanged(text)
+                if (text.isNotBlank()) {
+                    viewModel.onQueryChanged(text)
+                }
             }
             override fun afterTextChanged(s: Editable?) {}
         })
 
         binding.etSearch.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                viewModel.submitSearch(v.text.toString())
+                val query = v.text.toString().trim()
+                if (query.isNotEmpty()) {
+                    viewModel.submitSearch(query)
+                }
                 true
             } else false
         }
@@ -143,15 +169,14 @@ class SearchFragment : Fragment() {
     private fun renderRecentSearches(searches: List<String>) {
         val trendingList = listOf(
             "Spider-Man: Brand New Day",
+            "Drishyam",
+            "Naruto",
+            "Toxic",
             "Insidious: Out of the Further",
             "Fall 2: Deadpoint",
-            "Onslaught",
             "Lanterns",
             "Digger",
-            "Resident Evil",
-            "Other Mommy",
-            "Marshals",
-            "Between Steps"
+            "Resident Evil"
         )
         val combined = (searches + trendingList).distinct()
 
@@ -161,8 +186,10 @@ class SearchFragment : Fragment() {
                 text = query
                 isClickable = true
                 isCheckable = false
-                setTextColor(ContextCompat.getColor(context, R.color.text_primary))
-                setChipBackgroundColorResource(R.color.bg_card)
+                setEnsureMinTouchTargetSize(false)
+                chipCornerRadius = resources.displayMetrics.density * 10
+                setTextColor(ContextCompat.getColor(context, R.color.chip_text_unselected))
+                setChipBackgroundColorResource(R.color.chip_bg_unselected)
                 setChipStrokeColorResource(R.color.border)
                 chipStrokeWidth = 1f
                 setOnClickListener {
@@ -230,6 +257,9 @@ class SearchFragment : Fragment() {
             putExtra(MovieDetailsActivity.EXTRA_ID, item.displayId)
             putExtra(MovieDetailsActivity.EXTRA_IS_TV, item.isTvSeries)
             putExtra(MovieDetailsActivity.EXTRA_TITLE, item.displayTitle)
+            val posterUrl = item.resolvedPoster ?: item.resolvedBackdrop
+            putExtra(MovieDetailsActivity.EXTRA_POSTER, posterUrl)
+            putExtra(MovieDetailsActivity.EXTRA_BACKDROP, item.resolvedBackdrop ?: posterUrl)
         }
         startActivity(intent)
     }

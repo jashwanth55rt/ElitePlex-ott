@@ -14,5 +14,7 @@ data class HomeResponse(
     @SerializedName("top_movies")
     val topMovies: List<MovieItem>? = null,
     @SerializedName("top_tv")
-    val topTv: List<MovieItem>? = null
+    val topTv: List<MovieItem>? = null,
+    @SerializedName("netplay_admin")
+    val netplayAdmin: List<MovieItem>? = null
 )

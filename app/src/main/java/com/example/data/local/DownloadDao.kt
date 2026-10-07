@@ -13,8 +13,14 @@ interface DownloadDao {
     @Query("SELECT * FROM downloads ORDER BY createdAt DESC")
     fun getAllDownloads(): Flow<List<DownloadItemEntity>>
 
+    @Query("SELECT * FROM downloads ORDER BY createdAt DESC")
+    suspend fun getAllDownloadsList(): List<DownloadItemEntity>
+
     @Query("SELECT * FROM downloads WHERE id = :id LIMIT 1")
     suspend fun getDownload(id: String): DownloadItemEntity?
+
+    @Query("SELECT * FROM downloads WHERE contentId = :contentId")
+    suspend fun getDownloadsForContent(contentId: String): List<DownloadItemEntity>
 
     @Query("SELECT * FROM downloads WHERE downloadManagerId = :dmId LIMIT 1")
     suspend fun getDownloadByDmId(dmId: Long): DownloadItemEntity?

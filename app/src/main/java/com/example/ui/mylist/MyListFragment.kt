@@ -70,11 +70,13 @@ class MyListFragment : Fragment() {
                 putExtra(MovieDetailsActivity.EXTRA_ID, savedItem.id)
                 putExtra(MovieDetailsActivity.EXTRA_IS_TV, savedItem.type.equals("tv", ignoreCase = true))
                 putExtra(MovieDetailsActivity.EXTRA_TITLE, savedItem.title)
+                putExtra(MovieDetailsActivity.EXTRA_POSTER, savedItem.poster ?: savedItem.backdrop)
+                putExtra(MovieDetailsActivity.EXTRA_BACKDROP, savedItem.backdrop ?: savedItem.poster)
             }
             startActivity(intent)
         }
         binding.rvMyList.apply {
-            layoutManager = GridLayoutManager(requireContext(), 3)
+            layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = myListAdapter
         }
 
@@ -84,6 +86,7 @@ class MyListFragment : Fragment() {
                     putExtra(PlayerActivity.EXTRA_CONTENT_ID, downloadItem.contentId)
                     putExtra(PlayerActivity.EXTRA_TITLE, downloadItem.title)
                     putExtra(PlayerActivity.EXTRA_MEDIA_TYPE, downloadItem.mediaType)
+                    putExtra(PlayerActivity.EXTRA_POSTER, downloadItem.poster)
                     putExtra(PlayerActivity.EXTRA_OFFLINE_URI, downloadItem.localUri ?: downloadItem.downloadUrl)
                 }
                 startActivity(intent)

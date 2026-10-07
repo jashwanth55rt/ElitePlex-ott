@@ -1,5 +1,6 @@
 package com.example
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -8,8 +9,10 @@ import com.example.databinding.ActivityMainBinding
 import com.example.ui.home.HomeFragment
 import com.example.ui.movies.MoviesFragment
 import com.example.ui.mylist.MyListFragment
+import com.example.ui.player.PlayerActivity
 import com.example.ui.search.SearchFragment
 import com.example.ui.series.SeriesFragment
+import com.example.ui.settings.SettingsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val seriesFragment by lazy { SeriesFragment() }
     private val searchFragment by lazy { SearchFragment() }
     private val myListFragment by lazy { MyListFragment() }
-    private val settingsFragment by lazy { com.example.ui.settings.SettingsFragment() }
+    private val settingsFragment by lazy { SettingsFragment() }
 
     private var activeFragment: Fragment = homeFragment
 
@@ -54,28 +57,26 @@ class MainActivity : AppCompatActivity() {
                     switchFragment(moviesFragment, TAG_MOVIES)
                     true
                 }
+                R.id.nav_play -> {
+                    // Launch Media3 player or continue watching
+                    val intent = Intent(this, PlayerActivity::class.java).apply {
+                        putExtra(PlayerActivity.EXTRA_CONTENT_ID, "969681")
+                        putExtra(PlayerActivity.EXTRA_MEDIA_TYPE, "movie")
+                        putExtra(PlayerActivity.EXTRA_TITLE, "Spider-Man: Brand New Day")
+                    }
+                    startActivity(intent)
+                    false // Keep previous selected tab active
+                }
                 R.id.nav_series -> {
                     switchFragment(seriesFragment, TAG_SERIES)
                     true
                 }
-                R.id.nav_search -> {
-                    switchFragment(searchFragment, TAG_SEARCH)
-                    true
-                }
-                R.id.nav_mylist -> {
-                    switchFragment(myListFragment, TAG_MYLIST)
+                R.id.nav_settings -> {
+                    switchFragment(settingsFragment, TAG_SETTINGS)
                     true
                 }
                 else -> false
             }
-        }
-
-        binding.btnHeaderSearch.setOnClickListener {
-            binding.bottomNav.selectedItemId = R.id.nav_search
-        }
-
-        binding.btnHeaderDownloads.setOnClickListener {
-            binding.bottomNav.selectedItemId = R.id.nav_mylist
         }
 
         binding.btnFloatingMenu.setOnClickListener {
@@ -92,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         val title = android.widget.TextView(this).apply {
             text = "ElitePlex Quick Menu"
             textSize = 20f
-            setTextColor(getColor(R.color.accent_gold))
+            setTextColor(getColor(R.color.accent_green))
             typeface = android.graphics.Typeface.DEFAULT_BOLD
             setPadding(0, 0, 0, 32)
         }
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
                 orientation = android.widget.LinearLayout.HORIZONTAL
                 gravity = android.view.Gravity.CENTER_VERTICAL
                 setPadding(24, 28, 24, 28)
-                setBackgroundResource(R.drawable.bg_card_rounded)
+                setBackgroundResource(R.drawable.bg_card_24)
                 val params = android.widget.LinearLayout.LayoutParams(
                     android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             }
             val icon = android.widget.ImageView(this).apply {
                 setImageResource(iconRes)
-                imageTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.accent_gold))
+                imageTintList = android.content.res.ColorStateList.valueOf(getColor(R.color.accent_green))
                 val ip = android.widget.LinearLayout.LayoutParams(54, 54)
                 ip.marginEnd = 32
                 layoutParams = ip
@@ -135,25 +136,29 @@ class MainActivity : AppCompatActivity() {
             view.addView(itemLayout)
         }
 
+        createMenuItem("Search Movies & Series", R.drawable.ic_search) {
+            navigateToSearch()
+        }
+        createMenuItem("My List & Downloads", R.drawable.ic_bookmark) {
+            switchFragment(myListFragment, TAG_MYLIST)
+        }
         createMenuItem("Browse Anime Collection", R.drawable.ic_movie) {
             openSearchWithQuery("Anime")
         }
-        createMenuItem("Downloaded Videos", R.drawable.ic_download) {
-            binding.bottomNav.selectedItemId = R.id.nav_mylist
-        }
-        createMenuItem("Saved Watchlist", R.drawable.ic_bookmark) {
-            binding.bottomNav.selectedItemId = R.id.nav_mylist
-        }
         createMenuItem("App Settings & Storage", R.drawable.ic_settings) {
-            switchFragment(settingsFragment, TAG_SETTINGS)
+            binding.bottomNav.selectedItemId = R.id.nav_settings
         }
 
         bottomSheet.setContentView(view)
         bottomSheet.show()
     }
 
+    fun navigateToSearch() {
+        switchFragment(searchFragment, TAG_SEARCH)
+    }
+
     fun openSearchWithQuery(query: String) {
-        binding.bottomNav.selectedItemId = R.id.nav_search
+        switchFragment(searchFragment, TAG_SEARCH)
         searchFragment.searchForQuery(query)
     }
 

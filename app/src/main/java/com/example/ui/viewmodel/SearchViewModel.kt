@@ -68,7 +68,7 @@ class SearchViewModel(
 
         val result = searchRepository.search(query)
         result.onSuccess { response ->
-            val items = response.items.orEmpty()
+            val items = response.items.orEmpty().distinctBy { it.displayId }
             if (items.isEmpty()) {
                 _uiState.value = SearchUiState.Empty(query)
             } else {

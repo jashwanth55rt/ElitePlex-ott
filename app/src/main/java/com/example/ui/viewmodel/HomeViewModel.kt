@@ -22,7 +22,8 @@ sealed interface HomeUiState {
         val popularTv: List<MovieItem>,
         val trendingAnime: List<MovieItem>,
         val topMovies: List<MovieItem>,
-        val topTv: List<MovieItem>
+        val topTv: List<MovieItem>,
+        val netplayExclusives: List<MovieItem> = emptyList()
     ) : HomeUiState
     data class Error(val message: String) : HomeUiState
 }
@@ -51,26 +52,35 @@ class HomeViewModel(
             _uiState.value = HomeUiState.Loading
             val result = movieRepository.getHomeCatalog()
             result.onSuccess { data ->
-                val trending = data.trending.orEmpty()
-                val popularMovies = data.popularMovies.orEmpty()
-                val popularTv = data.popularTv.orEmpty()
-                val topMovies = data.topMovies.orEmpty()
-                val topTv = data.topTv.orEmpty()
+                val trending = data.trending.orEmpty().distinctBy { it.displayId }
+                val popularMovies = data.popularMovies.orEmpty().distinctBy { it.displayId }
+                val popularTv = data.popularTv.orEmpty().distinctBy { it.displayId }
+                val topMovies = data.topMovies.orEmpty().distinctBy { it.displayId }
+                val topTv = data.topTv.orEmpty().distinctBy { it.displayId }
+                val netplay = data.netplayAdmin.orEmpty().distinctBy { it.displayId }
 
-                val hero = trending.take(5).ifEmpty {
-                    popularMovies.take(5)
+                val hero = trending.take(6).ifEmpty {
+                    popularMovies.take(6)
                 }
 
-                val anime = searchRepository.search("anime").getOrNull()?.items.orEmpty()
+                // Extract high-quality anime & animation from catalog
+                val animeCatalog = (topTv + trending + popularTv + topMovies).filter { item ->
+                    val t = item.displayTitle.lowercase()
+                    val o = (item.overview ?: "").lowercase()
+                    t.contains("frieren") || t.contains("avatar") || t.contains("one piece") ||
+                    t.contains("arcane") || t.contains("takopi") || t.contains("anime") ||
+                    t.contains("hero") || t.contains("dragon") || o.contains("anime") || o.contains("manga")
+                }.distinctBy { it.displayId }
 
                 _uiState.value = HomeUiState.Success(
                     heroItems = hero,
                     trending = trending,
                     popularMovies = popularMovies,
                     popularTv = popularTv,
-                    trendingAnime = anime,
+                    trendingAnime = animeCatalog,
                     topMovies = topMovies,
-                    topTv = topTv
+                    topTv = topTv,
+                    netplayExclusives = netplay
                 )
             }.onFailure { error ->
                 _uiState.value = HomeUiState.Error(

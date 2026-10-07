@@ -7,17 +7,17 @@
     <item
         android:id="@+id/nav_movies"
         android:icon="@drawable/ic_movie"
-        android:title="Movies" />
+        android:title="Movie" />
+    <item
+        android:id="@+id/nav_play"
+        android:icon="@drawable/ic_play_arrow"
+        android:title="Play" />
     <item
         android:id="@+id/nav_series"
         android:icon="@drawable/ic_tv"
         android:title="Series" />
     <item
-        android:id="@+id/nav_search"
-        android:icon="@drawable/ic_search"
-        android:title="Search" />
-    <item
-        android:id="@+id/nav_mylist"
-        android:icon="@drawable/ic_bookmark"
-        android:title="My List" />
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings" />
 </menu>

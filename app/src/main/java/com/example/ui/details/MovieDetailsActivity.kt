@@ -45,6 +45,8 @@ class MovieDetailsActivity : AppCompatActivity() {
     private var contentId: String = ""
     private var isTv: Boolean = false
     private var contentTitle: String = ""
+    private var initialPoster: String? = null
+    private var initialBackdrop: String? = null
     private lateinit var episodesAdapter: EpisodesAdapter
     private lateinit var moreLikeThisAdapter: HorizontalMovieAdapter
 
@@ -56,6 +58,8 @@ class MovieDetailsActivity : AppCompatActivity() {
         contentId = intent.getStringExtra(EXTRA_ID).orEmpty()
         isTv = intent.getBooleanExtra(EXTRA_IS_TV, false)
         contentTitle = intent.getStringExtra(EXTRA_TITLE).orEmpty()
+        initialPoster = intent.getStringExtra(EXTRA_POSTER)
+        initialBackdrop = intent.getStringExtra(EXTRA_BACKDROP)
 
         setupToolbar()
         setupAdapters()
@@ -63,7 +67,7 @@ class MovieDetailsActivity : AppCompatActivity() {
         observeData()
 
         if (contentId.isNotEmpty()) {
-            viewModel.loadDetails(contentId, isTv)
+            viewModel.loadDetails(contentId, isTv, contentTitle, initialPoster)
         }
     }
 
@@ -141,6 +145,8 @@ class MovieDetailsActivity : AppCompatActivity() {
                 putExtra(PlayerActivity.EXTRA_CONTENT_ID, contentId)
                 putExtra(PlayerActivity.EXTRA_MEDIA_TYPE, mediaType)
                 putExtra(PlayerActivity.EXTRA_TITLE, contentTitle)
+                putExtra(PlayerActivity.EXTRA_POSTER, currentPosterUrl ?: initialPoster)
+                putExtra(PlayerActivity.EXTRA_BACKDROP, currentState?.detail?.backdrop ?: initialBackdrop)
                 if (mediaType == "tv") {
                     putExtra(PlayerActivity.EXTRA_SEASON, 1)
                     putExtra(PlayerActivity.EXTRA_EPISODE, 1)
@@ -163,7 +169,7 @@ class MovieDetailsActivity : AppCompatActivity() {
         }
 
         binding.btnRetry.setOnClickListener {
-            viewModel.loadDetails(contentId, isTv)
+            viewModel.loadDetails(contentId, isTv, contentTitle, initialPoster)
         }
     }
 
@@ -342,5 +348,7 @@ class MovieDetailsActivity : AppCompatActivity() {
         const val EXTRA_ID = "extra_content_id"
         const val EXTRA_IS_TV = "extra_is_tv"
         const val EXTRA_TITLE = "extra_title"
+        const val EXTRA_POSTER = "extra_poster"
+        const val EXTRA_BACKDROP = "extra_backdrop"
     }
 }

@@ -39,23 +39,28 @@ class DetailsViewModel(
     private var currentId: String = ""
     private var isTv: Boolean = false
 
-    fun loadDetails(id: String, isTvSeries: Boolean) {
+    fun loadDetails(
+        id: String,
+        isTvSeries: Boolean,
+        fallbackTitle: String? = null,
+        fallbackPoster: String? = null
+    ) {
         currentId = id
         isTv = isTvSeries
         _uiState.value = DetailsUiState.Loading
 
         viewModelScope.launch {
             var detailResult = if (isTvSeries) {
-                seriesRepository.getTvDetail(id)
+                seriesRepository.getTvDetail(id, fallbackTitle, fallbackPoster)
             } else {
-                movieRepository.getMovieDetail(id, isTv = false)
+                movieRepository.getMovieDetail(id, isTv = false, fallbackTitle, fallbackPoster)
             }
 
             if (detailResult.isFailure) {
                 val altResult = if (isTvSeries) {
-                    movieRepository.getMovieDetail(id, isTv = false)
+                    movieRepository.getMovieDetail(id, isTv = false, fallbackTitle, fallbackPoster)
                 } else {
-                    seriesRepository.getTvDetail(id)
+                    seriesRepository.getTvDetail(id, fallbackTitle, fallbackPoster)
                 }
                 if (altResult.isSuccess) {
                     detailResult = altResult
