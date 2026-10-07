@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Golden emblem rounded badge (center is 54, 54) -->
+    <path
+        android:fillColor="#FFB62E"
+        android:pathData="M34,26 C28.5,26 24,30.5 24,36 L24,72 C24,77.5 28.5,82 34,82 L74,82 C79.5,82 84,77.5 84,72 L84,36 C84,30.5 79.5,26 74,26 Z" />
+    <!-- Film reel accent line at top -->
+    <path
+        android:fillColor="#E59E18"
+        android:pathData="M24,38 L84,38 L84,35 C84,30.5 79.5,26 74,26 L34,26 C28.5,26 24,30.5 24,35 Z" />
+    <!-- Cinematic Play Triangle inside the badge -->
+    <path
+        android:fillColor="#120F24"
+        android:pathData="M48,42 L48,66 C48,67.6 49.8,68.6 51.2,67.7 L70.4,55.7 C71.6,54.9 71.6,53.1 70.4,52.3 L51.2,40.3 C49.8,39.4 48,40.4 48,42 Z" />
+    <!-- Star accent in top corner of emblem -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M76,32 L77,34.5 L79.5,35.5 L77,36.5 L76,39 L75,36.5 L72.5,35.5 L75,34.5 Z" />
+</vector>

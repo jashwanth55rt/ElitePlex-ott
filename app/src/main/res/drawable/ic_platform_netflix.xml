@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="@color/brand_netflix"
+        android:pathData="M14,6h6.5l7,24 0.2,-24H34v36h-6.5l-7,-24 -0.2,24H14V6z"/>
+</vector>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginEnd="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="115dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="@color/bg_surface">
+
+        <ImageView
+            android:id="@+id/iv_cw_backdrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_poster_placeholder"
+            android:contentDescription="Continue Watching" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#44000000" />
+
+        <!-- Play Circle Overlay in Center -->
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_chip"
+            android:padding="8dp"
+            android:src="@drawable/ic_play_arrow"
+            app:tint="@color/accent_gold"
+            android:contentDescription="Resume Playback" />
+
+        <!-- Progress Indicator at Bottom -->
+        <ProgressBar
+            android:id="@+id/pb_cw_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom"
+            android:progress="45"
+            android:max="100"
+            android:progressBackgroundTint="@color/divider_line"
+            android:progressTint="@color/accent_gold" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tv_cw_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Spider-Man"
+        android:textColor="@color/text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_cw_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:text="Continue Watching"
+        android:textColor="@color/accent_gold"
+        android:textSize="11sp" />
+
+</LinearLayout>
